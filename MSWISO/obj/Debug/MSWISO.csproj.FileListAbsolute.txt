@@ -1,0 +1,11 @@
+C:\Users\remus\source\repos\MSWISO\MSWISO\bin\Debug\MSWISO.exe
+C:\Users\remus\source\repos\MSWISO\MSWISO\bin\Debug\MSWISO.pdb
+C:\Users\remus\source\repos\MSWISO\MSWISO\bin\Debug\HtmlAgilityPack.dll
+C:\Users\remus\source\repos\MSWISO\MSWISO\bin\Debug\HtmlAgilityPack.pdb
+C:\Users\remus\source\repos\MSWISO\MSWISO\bin\Debug\HtmlAgilityPack.xml
+C:\Users\remus\source\repos\MSWISO\MSWISO\obj\Debug\MSWISO.csproj.AssemblyReference.cache
+C:\Users\remus\source\repos\MSWISO\MSWISO\obj\Debug\MSWISO.csproj.CoreCompileInputs.cache
+C:\Users\remus\source\repos\MSWISO\MSWISO\obj\Debug\MSWISO.csproj.CopyComplete
+C:\Users\remus\source\repos\MSWISO\MSWISO\obj\Debug\MSWISO.exe
+C:\Users\remus\source\repos\MSWISO\MSWISO\obj\Debug\MSWISO.pdb
+C:\Users\remus\source\repos\MSWISO\MSWISO\bin\Debug\MSWISO.exe.config
