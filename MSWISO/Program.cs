@@ -39,7 +39,6 @@ class Program
         for (int i = 0; i < args.Length; i++)
         {
             string arg = args[i];
-            Console.WriteLine(arg);
             if (arg.StartsWith("--"))
             {
                 string[] parts = arg.Substring(2).Split('=');
@@ -91,7 +90,6 @@ class Program
         {
             if (winVer != null)
             {
-                Console.WriteLine(winVer);
                 MakeTXT(winVer);
             }
             if (release != null & winVer != null)
@@ -124,7 +122,6 @@ class Program
                 if (langURL != null)
                 {
                     ISOFilter(langURL);
-                    Console.WriteLine(langURL);
                 }
 
             }
@@ -203,7 +200,6 @@ class Program
           
             searchfor = "Operating Systems";
         }
-        Console.WriteLine(searchfor);
         DataTable dataTable = new DataTable();
         var newload = new HtmlWeb();
         var url = newload.Load("https://files.rg-adguard.net/category");
@@ -469,16 +465,6 @@ class Program
 
         if (urlsAndHypertexts.Count > 0)
         {
-            //string pattern = @"^\d.*[^\w]x64[^\w].*\.iso$";
-            //List<string[]> filteredArray = new List<string[]>();
-
-            //foreach (string[] row in urlsAndHypertexts)
-            //{
-            //    if (System.Text.RegularExpressions.Regex.IsMatch(row[1], pattern) && row[1].Contains("x64"))
-            //    {
-            //        filteredArray.Add(row);
-            //    }
-            //}
             string pattern = @"^\d.*?x64.*?\"+ ext +"$"; 
 
             List<string[]> filteredArray = new List<string[]>();
@@ -604,33 +590,6 @@ class Program
                        await ESDDownload(response, progressFileName);
                     }
                 }
-
-
-
-                //long? totalSize = response.Content.Headers.ContentLength;
-
-                //using (Stream contentStream = await response.Content.ReadAsStreamAsync())
-                //using (FileStream fs = new FileStream("test" + ext, FileMode.Create))
-                //using (StreamWriter progressWriter = new StreamWriter(progressFileName))
-                //{
-                //    byte[] buffer = new byte[8192];
-                //    int bytesRead;
-                //    long totalBytesRead = 0;
-                //    //
-                //    while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
-                //    {
-                //        await fs.WriteAsync(buffer, 0, bytesRead);
-
-                //        totalBytesRead += bytesRead;
-
-                //        if (totalSize.HasValue)
-                //        {
-                //            double progressPercentage = (double)totalBytesRead / totalSize.Value;
-                //            progressWriter.WriteLine($"{progressPercentage:P2}");
-                //            Console.WriteLine($"{progressPercentage:P2}");
-                //        }
-                //    }
-                //}
             }
 
             else
@@ -679,56 +638,11 @@ class Program
 
                     }
                 }
-                
-                
-                    
-                    else
-                    {
-
-                    }
-                
             }
 
 
         }
     }
-
-    //static async Task ESDDownload(HttpResponseMessage response, string progressFileName)
-    //{
-    //    if (response.IsSuccessStatusCode)
-    //    {
-    //        long? totalSize = response.Content.Headers.ContentLength;
-    //        string continMode = continueDlnd ? "Append" : "Create";
-    //        FileMode fileMode = continMode == "Append" ? FileMode.Append : FileMode.Create;
-
-    //        using (Stream contentStream = await response.Content.ReadAsStreamAsync())
-    //        using (FileStream fs = new FileStream("test" + ext, fileMode))
-    //        {
-    //            byte[] buffer = new byte[8192];
-    //            int bytesRead;
-    //            long totalBytesRead = 0;
-
-    //            while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
-    //            {
-    //                await fs.WriteAsync(buffer, 0, bytesRead);
-
-    //                totalBytesRead += bytesRead;
-
-    //                if (totalSize.HasValue)
-    //                {
-    //                    double prevPercent = -1;
-    //                    double progressPercentage = (double)totalBytesRead / totalSize.Value;
-
-    //                    if (prevPercent != progressPercentage)
-    //                    {
-    //                        Console.WriteLine($"{progressPercentage:P2}");
-    //                        prevPercent = progressPercentage;
-    //                    }
-    //                }
-    //            }
-    //        }
-    //    }
-    //}
     static async Task ESDDownload(HttpResponseMessage response, string progressFileName)
     {
         if (response.IsSuccessStatusCode)

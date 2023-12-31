@@ -9,3 +9,14 @@ C:\Users\remus\source\repos\MSWISO\MSWISO\obj\Release\MSWISO.csproj.CoreCompileI
 C:\Users\remus\source\repos\MSWISO\MSWISO\obj\Release\MSWISO.csproj.CopyComplete
 C:\Users\remus\source\repos\MSWISO\MSWISO\obj\Release\MSWISO.exe
 C:\Users\remus\source\repos\MSWISO\MSWISO\obj\Release\MSWISO.pdb
+C:\Users\remus\source\repos\Clones\MSWISO\bin\Release\MSWISO.exe.config
+C:\Users\remus\source\repos\Clones\MSWISO\bin\Release\MSWISO.exe
+C:\Users\remus\source\repos\Clones\MSWISO\bin\Release\MSWISO.pdb
+C:\Users\remus\source\repos\Clones\MSWISO\bin\Release\HtmlAgilityPack.dll
+C:\Users\remus\source\repos\Clones\MSWISO\bin\Release\HtmlAgilityPack.pdb
+C:\Users\remus\source\repos\Clones\MSWISO\bin\Release\HtmlAgilityPack.xml
+C:\Users\remus\source\repos\Clones\MSWISO\obj\Release\MSWISO.csproj.AssemblyReference.cache
+C:\Users\remus\source\repos\Clones\MSWISO\obj\Release\MSWISO.csproj.CoreCompileInputs.cache
+C:\Users\remus\source\repos\Clones\MSWISO\obj\Release\MSWISO.csproj.CopyComplete
+C:\Users\remus\source\repos\Clones\MSWISO\obj\Release\MSWISO.exe
+C:\Users\remus\source\repos\Clones\MSWISO\obj\Release\MSWISO.pdb
