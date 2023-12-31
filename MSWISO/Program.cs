@@ -1,4 +1,5 @@
-﻿using System;
+﻿// Thanks for using my program! Please consider to support me by giving me tips! -Elias Ailenei github.com/eliasailenei
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
@@ -19,17 +20,26 @@ class Program
     static string language;
     static string passthrough;
     static string foundUrl;
-
+    static bool continueDlnd;
+    static bool esd = false;
+   static bool torrent = false;
+    static string ext;
+    static bool usingTorrent = false;
+    static string downloc = null;
     static async Task Main(string[] args)
     {
         string winVer = null;
         string release = null;
         string language = null;
+        string esdmode = null;
+        string torrentdownload = null;
         string help = "placehold";
+       
 
         for (int i = 0; i < args.Length; i++)
         {
             string arg = args[i];
+            Console.WriteLine(arg);
             if (arg.StartsWith("--"))
             {
                 string[] parts = arg.Substring(2).Split('=');
@@ -42,12 +52,26 @@ class Program
                     else if (variableName == "Release") release = variableValue;
                     else if (variableName == "Language") language = variableValue;
                     else if (variableName == "Help") help = variableValue;
+                    else if (variableName == "ESDMode") esdmode = variableValue;
+                    else if (variableName == "TorrentDownload") torrentdownload = variableValue;
+                    else if (variableName == "Location") downloc = variableValue;
                 }
             }
         }
+        if (string.Equals(esdmode, "true", StringComparison.OrdinalIgnoreCase))
+        {
 
+            esd = true;
+            
+        }
+        if (string.Equals(torrentdownload, "true", StringComparison.OrdinalIgnoreCase))
+        {
+
+            torrent = true;
+
+        }
         string[] validVersions = { "Windows 7", "Windows 8", "Windows 10", "Windows 11" };
-        dataTable = CreateTable();
+        dataTable = CreateTable(esd);
 
         if (winVer == null)
         {
@@ -67,6 +91,7 @@ class Program
         {
             if (winVer != null)
             {
+                Console.WriteLine(winVer);
                 MakeTXT(winVer);
             }
             if (release != null & winVer != null)
@@ -98,15 +123,14 @@ class Program
                 string langURL = await GetLangURL(language);
                 if (langURL != null)
                 {
-                    Console.WriteLine("Language URL found:");
-                    Console.WriteLine(langURL);
                     ISOFilter(langURL);
+                    Console.WriteLine(langURL);
                 }
 
             }
 
         }
-
+        Console.ReadLine();
     }
 
     static DataRow FindMatchingRow(string columnName, string searchValue)
@@ -134,6 +158,8 @@ class Program
         Console.WriteLine();
         Console.WriteLine("This program is part of PortableISO, but can be used separately!");
         Console.WriteLine();
+        Console.WriteLine("Many thanks to the creators of aria2c.exe, any issues please say on my GitHub.");
+        Console.WriteLine();
         Console.WriteLine("How to use:");
         Console.WriteLine("-----------");
         Console.WriteLine("Please note that you cannot use spaces in the options; instead, use underscores (_) for spaces. Here are the available options:");
@@ -153,19 +179,37 @@ class Program
         Console.WriteLine(" |--> You can see different Windows version languages from a text file provided.");
         Console.WriteLine("Note: To generate the text file, leave Languages blank but not Releases MSWISO.exe --WinVer=Windows_7 --Release=7,_with_Service_Pack_1 --Language=");
         Console.WriteLine();
+        Console.WriteLine("ESDMode = If you only want the ESD, use case MSWISO.exe --ESDMode=True --WinVer=Windows_7 --Release=7,_with_Service_Pack_1 --Language=German");
+        Console.WriteLine("Note: Anything else than a 'True' is seen as False.");
+        Console.WriteLine();
+        Console.WriteLine("TorrentDownload = If you are happy to use archived versions of image, use case MSWISO.exe --TorrentDownload=True --WinVer=Windows_7 --Release=7,_with_Service_Pack_1 --Language=German");
+        Console.WriteLine("Note: Anything else than a 'True' is seen as False.");
         Console.WriteLine();
         Console.WriteLine("Help = Launches this message, if you also didn't use any options, help will also show...");
 
     }
 
-    static DataTable CreateTable()
+    static DataTable CreateTable(bool esd)
     {
+        
+        string searchfor;
+        if (esd == true)
+        {
+            
+            searchfor = "Operating Systems - (ESD)";
+        }
+        else
+        {
+          
+            searchfor = "Operating Systems";
+        }
+        Console.WriteLine(searchfor);
         DataTable dataTable = new DataTable();
         var newload = new HtmlWeb();
         var url = newload.Load("https://files.rg-adguard.net/category");
         var link = url.DocumentNode
             .Descendants("a")
-            .FirstOrDefault(a => a.InnerText == "Operating Systems");
+            .FirstOrDefault(a => a.InnerText == searchfor);
         dataTable = new DataTable();
         if (link != null)
         {
@@ -185,6 +229,7 @@ class Program
         string selectedVersion = winVer;
 
         DataRow[] filteredRows = dataTable.Select($"Name LIKE '%{selectedVersion}%'");
+      
 
         string outputFilePath = "output.txt";
         using (StreamWriter writer = new StreamWriter(outputFilePath))
@@ -253,7 +298,7 @@ class Program
 
         if (anchorTags != null)
         {
-            string outputFilePath = "languages.txt"; 
+            string outputFilePath = "languages.txt";
             using (StreamWriter writer = new StreamWriter(outputFilePath))
             {
                 foreach (var anchorTag in anchorTags)
@@ -277,6 +322,7 @@ class Program
             }
         }
     }
+
 
     static void filer1(string release)
     {
@@ -407,6 +453,15 @@ class Program
     }
     static void ISOFilter(string langURL)
     {
+
+        if (esd)
+        {
+            ext = ".esd";
+        }
+        else
+        {
+            ext = ".iso";
+        }
         bool found = false;
         string foundUrl = "";
         string targetUrl = langURL;
@@ -414,12 +469,23 @@ class Program
 
         if (urlsAndHypertexts.Count > 0)
         {
-            string pattern = @"^\d.*\.iso$";
+            //string pattern = @"^\d.*[^\w]x64[^\w].*\.iso$";
+            //List<string[]> filteredArray = new List<string[]>();
+
+            //foreach (string[] row in urlsAndHypertexts)
+            //{
+            //    if (System.Text.RegularExpressions.Regex.IsMatch(row[1], pattern) && row[1].Contains("x64"))
+            //    {
+            //        filteredArray.Add(row);
+            //    }
+            //}
+            string pattern = @"^\d.*?x64.*?\"+ ext +"$"; 
+
             List<string[]> filteredArray = new List<string[]>();
 
             foreach (string[] row in urlsAndHypertexts)
             {
-                if (System.Text.RegularExpressions.Regex.IsMatch(row[1], pattern) && row[1].Contains("x64"))
+                if (System.Text.RegularExpressions.Regex.IsMatch(row[1], pattern))
                 {
                     filteredArray.Add(row);
                 }
@@ -427,7 +493,7 @@ class Program
 
             if (filteredArray.Count == 0)
             {
-                string langPattern = @"(en-us|en-gb|es-es|es|fr-fr|fr|de-de|de|zh-cn|zh|ja-jp|ja|ko-kr|ko|it-it|it|pt-br|pt|pt-pt|ru-ru|ru|ar-sa|ar|tr-tr|tr|nl-nl|nl|pl-pl|pl|sv-se|sv|nb-no|nb|da-dk|da|fi-fi|fi|el-gr|el|he-il|he|hi-in|hi|th-th|th|vi-vn|vi|uk-ua|uk|cs-cz|cs|hu-hu|hu|ro-ro|ro|bg-bg|bg|ms-my|ms|id-id|id|fil-ph|fil|bn-in|bn|ur-pk|ur|pa-in|pa|ta-in|ta).*64.*\.iso$";
+                string langPattern = @"(en-us|en-gb|es-es|es|fr-fr|fr|de-de|de|zh-cn|zh|ja-jp|ja|ko-kr|ko|it-it|it|pt-br|pt|pt-pt|ru-ru|ru|ar-sa|ar|tr-tr|tr|nl-nl|nl|pl-pl|pl|sv-se|sv|nb-no|nb|da-dk|da|fi-fi|fi|el-gr|el|he-il|he|hi-in|hi|th-th|th|vi-vn|vi|uk-ua|uk|cs-cz|cs|hu-hu|hu|ro-ro|ro|bg-bg|bg|ms-my|ms|id-id|id|fil-ph|fil|bn-in|bn|ur-pk|ur|pa-in|pa|ta-in|ta).*64.*[^\w]x64[^\w].*\" + ext + "$";
 
                 foreach (string[] row in urlsAndHypertexts)
                 {
@@ -436,7 +502,7 @@ class Program
                         filteredArray.Add(row);
                         break;
                     }
-                    
+
 
                     if (filteredArray.Count > 0)
                     {
@@ -487,33 +553,32 @@ class Program
 
 
 
+
     public static void POST(string foundUrl)
     {
-        Task task = MakePostRequest(foundUrl);
+        Task task = MakePostRequestWithRetry(foundUrl);
         task.Wait();
         Console.WriteLine("Press Enter to exit.");
 
     }
-    public static async Task MakePostRequest(string foundUrl)
+    public static async Task MakePostRequestWithRetry(string foundUrl)
     {
         string url = foundUrl;
         string progressFileName = "progress.txt";
-        bool usingtorrent = false;
 
         using (HttpClient httpClient = new HttpClient())
         {
             var payloadOfficial = new FormUrlEncodedContent(new[]
             {
-        new KeyValuePair<string, string>("dl_official", "Test")
-    });
+                new KeyValuePair<string, string>("dl_official", "Test")
+            });
 
             var payloadBt = new FormUrlEncodedContent(new[]
             {
-        new KeyValuePair<string, string>("dl_bt", "Test")
-    });
+                new KeyValuePair<string, string>("dl_bt", "Test")
+            });
 
             HttpResponseMessage response;
-
 
             response = await httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Post, url)
             {
@@ -522,36 +587,55 @@ class Program
 
             if (response.IsSuccessStatusCode)
             {
-                long? totalSize = response.Content.Headers.ContentLength;
-
-                using (Stream contentStream = await response.Content.ReadAsStreamAsync())
-                using (FileStream fs = new FileStream("test.iso", FileMode.Create))
-                using (StreamWriter progressWriter = new StreamWriter(progressFileName))
+                try
                 {
-                    byte[] buffer = new byte[8192];
-                    int bytesRead;
-                    long totalBytesRead = 0;
-
-                    while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                    await ESDDownload(response, progressFileName);
+                }
+                catch (Exception ex)
+                {
+                    if (ex is System.UriFormatException uriException && uriException.Message.Contains("An invalid request URI was provided"))
                     {
-                        await fs.WriteAsync(buffer, 0, bytesRead);
-
-                        totalBytesRead += bytesRead;
-
-                        if (totalSize.HasValue)
-                        {
-                            double progressPercentage = (double)totalBytesRead / totalSize.Value;
-                            progressWriter.WriteLine($"{progressPercentage:P2}");
-                            Console.WriteLine($"{progressPercentage:P2}");
-                        }
+                        File.WriteAllText("NoAva.txt", "True");
+                        Console.WriteLine("MS error, file no longer hosted. Try a newer version...");
+                    }
+                    else
+                    {
+                      continueDlnd = true;
+                       await ESDDownload(response, progressFileName);
                     }
                 }
 
-                Console.WriteLine("File download completed!");
+
+
+                //long? totalSize = response.Content.Headers.ContentLength;
+
+                //using (Stream contentStream = await response.Content.ReadAsStreamAsync())
+                //using (FileStream fs = new FileStream("test" + ext, FileMode.Create))
+                //using (StreamWriter progressWriter = new StreamWriter(progressFileName))
+                //{
+                //    byte[] buffer = new byte[8192];
+                //    int bytesRead;
+                //    long totalBytesRead = 0;
+                //    //
+                //    while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                //    {
+                //        await fs.WriteAsync(buffer, 0, bytesRead);
+
+                //        totalBytesRead += bytesRead;
+
+                //        if (totalSize.HasValue)
+                //        {
+                //            double progressPercentage = (double)totalBytesRead / totalSize.Value;
+                //            progressWriter.WriteLine($"{progressPercentage:P2}");
+                //            Console.WriteLine($"{progressPercentage:P2}");
+                //        }
+                //    }
+                //}
             }
+
             else
             {
-                usingtorrent = true;
+                usingTorrent = true;
                 response = await httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Post, url)
                 {
                     Content = payloadBt
@@ -559,74 +643,174 @@ class Program
 
                 if (response.IsSuccessStatusCode)
                 {
-                    long? totalSize = response.Content.Headers.ContentLength;
-
-                    using (Stream contentStream = await response.Content.ReadAsStreamAsync())
-                    using (FileStream fs = new FileStream("test.torrent", FileMode.Create))
-                    using (StreamWriter progressWriter = new StreamWriter(progressFileName))
-                    {
-                        byte[] buffer = new byte[8192];
-                        int bytesRead;
-                        long totalBytesRead = 0;
-
-                        while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
-                        {
-                            await fs.WriteAsync(buffer, 0, bytesRead);
-
-                            totalBytesRead += bytesRead;
-
-                            if (totalSize.HasValue)
-                            {
-                                double progressPercentage = (double)totalBytesRead / totalSize.Value;
-                                progressWriter.WriteLine($"{progressPercentage:P2}");
-                                Console.WriteLine($"{progressPercentage:P2}");
-                            }
-                        }
-                    }
+                   await TorrentDownload(response, progressFileName);
 
                     Console.WriteLine("File download completed!");
-                }
-                else
-                {
-
-                }
-            }
-        }
-        if (usingtorrent)
-        {
-            string torrentUrl = "test.torrent";
-
-            ProcessStartInfo startInfo = new ProcessStartInfo
-            {
-                FileName = "aria2c",
-                Arguments = $"--show-console-readout=true \"{torrentUrl}\"",
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-
-
-            using (Process process = new Process { StartInfo = startInfo })
-            {
-                process.Start();
-
-                using (StreamWriter progressWriter = new StreamWriter(progressFileName))
-                {
-                    while (!process.StandardOutput.EndOfStream)
+                    using (StreamWriter writer = new StreamWriter("usingtor.txt"))
                     {
-                        string line = process.StandardOutput.ReadLine();
-                        Console.WriteLine(line);
-                        progressWriter.WriteLine(line);
+                        writer.Write("True");
+                    }
+                    Console.WriteLine(torrent);
+                    if (torrent)
+                    {
+                        string torrentUrl = "test.torrent";
+
+                        ProcessStartInfo startInfo = new ProcessStartInfo
+                        {
+                            FileName = "aria2c",
+                            Arguments = $"--show-console-readout=true \"{torrentUrl}\" --dir=\"{downloc}\"\\ ",
+                            RedirectStandardOutput = true,
+                            UseShellExecute = false,
+                            CreateNoWindow = true
+                        };
+
+                        using (Process process = new Process { StartInfo = startInfo })
+                        {
+                            process.Start();
+                            while (!process.StandardOutput.EndOfStream)
+                            {
+                                string WhtOut = process.StandardOutput.ReadLine();
+                                AddProgress(WhtOut);
+                                
+
+                            }
+                            process.WaitForExit();
+                        }
+
                     }
                 }
+                
+                
+                    
+                    else
+                    {
 
-                process.WaitForExit();
+                    }
+                
+            }
+
+
+        }
+    }
+
+    //static async Task ESDDownload(HttpResponseMessage response, string progressFileName)
+    //{
+    //    if (response.IsSuccessStatusCode)
+    //    {
+    //        long? totalSize = response.Content.Headers.ContentLength;
+    //        string continMode = continueDlnd ? "Append" : "Create";
+    //        FileMode fileMode = continMode == "Append" ? FileMode.Append : FileMode.Create;
+
+    //        using (Stream contentStream = await response.Content.ReadAsStreamAsync())
+    //        using (FileStream fs = new FileStream("test" + ext, fileMode))
+    //        {
+    //            byte[] buffer = new byte[8192];
+    //            int bytesRead;
+    //            long totalBytesRead = 0;
+
+    //            while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+    //            {
+    //                await fs.WriteAsync(buffer, 0, bytesRead);
+
+    //                totalBytesRead += bytesRead;
+
+    //                if (totalSize.HasValue)
+    //                {
+    //                    double prevPercent = -1;
+    //                    double progressPercentage = (double)totalBytesRead / totalSize.Value;
+
+    //                    if (prevPercent != progressPercentage)
+    //                    {
+    //                        Console.WriteLine($"{progressPercentage:P2}");
+    //                        prevPercent = progressPercentage;
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
+    //}
+    static async Task ESDDownload(HttpResponseMessage response, string progressFileName)
+    {
+        if (response.IsSuccessStatusCode)
+        {
+            long? totalSize = response.Content.Headers.ContentLength;
+            string continMode = continueDlnd ? "Append" : "Create";
+            FileMode fileMode = continMode == "Append" ? FileMode.Append : FileMode.Create;
+
+            using (Stream contentStream = await response.Content.ReadAsStreamAsync())
+            using (FileStream fs = new FileStream(downloc + "test" + ext, fileMode))
+            {
+                byte[] buffer = new byte[8192];
+                int bytesRead;
+                long totalBytesRead = 0;
+                int prevPercent = -1;
+
+                while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                {
+                    await fs.WriteAsync(buffer, 0, bytesRead);
+
+                    totalBytesRead += bytesRead;
+
+                    if (totalSize.HasValue)
+                    {
+                        int progressPercentage = (int)(((double)totalBytesRead / totalSize.Value) * 100);
+
+                        if (progressPercentage != prevPercent)
+                        {
+                            Console.WriteLine($"{progressPercentage}%");
+                            prevPercent = progressPercentage;
+                        }
+                    }
+                }
             }
         }
-
-
     }
+
+
+    static async Task TorrentDownload (HttpResponseMessage response, string progressFileName)
+    {
+        long? totalSize = response.Content.Headers.ContentLength;
+        using (Stream contentStream = await response.Content.ReadAsStreamAsync())
+        using (FileStream fs = new FileStream("test" + ext, FileMode.Create))
+        using (StreamWriter progressWriter = new StreamWriter(progressFileName))
+        {
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            long totalBytesRead = 0;
+
+            while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+            {
+                await fs.WriteAsync(buffer, 0, bytesRead);
+
+                totalBytesRead += bytesRead;
+
+                if (totalSize.HasValue)
+                {
+                    double progressPercentage = (double)totalBytesRead / totalSize.Value;
+                    progressWriter.WriteLine($"{progressPercentage:P2}");
+                    Console.WriteLine($"{progressPercentage:P2}");
+                }
+            }
+        }
+    }
+    
+    static  void AddProgress(string common)
+    {
+        string pattern = @"\((\d+)%\)";
+        MatchCollection matches = Regex.Matches(common, pattern);
+        string newInput = "";
+        foreach (Match newMatch in matches)
+        {
+            newInput += newMatch.Groups[1].Value + "%";
+        }
+
+        using (StreamWriter writer = new StreamWriter("progress.txt", true))
+        {
+            writer.WriteLine(newInput);
+            Console.WriteLine(newInput);
+        }
+    }
+
 
 
 
