@@ -127,7 +127,7 @@ class Program
             }
 
         }
-        Console.ReadLine();
+      
     }
 
     static DataRow FindMatchingRow(string columnName, string searchValue)
@@ -183,7 +183,7 @@ class Program
         Console.WriteLine("Note: Anything else than a 'True' is seen as False.");
         Console.WriteLine();
         Console.WriteLine("Help = Launches this message, if you also didn't use any options, help will also show...");
-
+        Console.ReadLine();
     }
 
     static DataTable CreateTable(bool esd)
