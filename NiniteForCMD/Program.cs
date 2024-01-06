@@ -207,19 +207,29 @@ class NiniteForCMD
                     
                 }
                 string location = args[findLoc + 1];
-                downLocation = location;
-                Console.WriteLine($"Download location: {location}");
-            }
-            string[] split = userLower.Split(' ');
-            if (split.Length >= 2)
+                int problem = location.IndexOf(',');
+                if (problem != -1)
+                {
+                    downLocation = location.Substring(0, problem);
+                } else
+                {
+                    downLocation = location;
+                }
+                
+                Console.WriteLine($"Download location: {downLocation}");
+            } else
             {
-                string location = split[1];
-                downLocation = location;
-                Console.WriteLine($"Download location: {location}");
-            }
-            else
-            {
-                Console.WriteLine("Invalid input for LOCATION. Please provide a valid location.");
+                string[] split = userLower.Split(' ');
+                if (split.Length >= 2)
+                {
+                    string location = split[1];
+                    downLocation = location;
+                    Console.WriteLine($"Download location: {location}");
+                }
+                else
+                {
+                    Console.WriteLine("Invalid input for LOCATION. Please provide a valid location.");
+                }
             }
         }catch (Exception e)
         {
@@ -451,21 +461,6 @@ EXIT - Ends session.
             }
         }
     }
-
-    static async Task DownloadFile(string fileUrl, string savePath)
-    {
-        await Task.Run(() =>
-        {
-            Console.WriteLine("Download started");
-            using (WebClient client = new WebClient())
-            {
-                client.DownloadFile(fileUrl, savePath);
-            }
-        });
-        
-    }
-
-
     static String URLCreate()
     {
         string regex = @"-+$";
@@ -479,6 +474,9 @@ EXIT - Ends session.
                 {
                     uri.Append(word);
                     uri.Append("-");
+                } else
+                {
+                    break;
                 }
                 
             }
@@ -496,7 +494,10 @@ EXIT - Ends session.
     static async void Download(bool Install)
     {
         download = URLCreate() + "ninite.exe";
-        await DownloadFile(download,downLocation +  "setup.exe");
+        using (WebClient client = new WebClient())
+        {
+            client.DownloadFile(download, downLocation + "setup.exe");
+        }
         if (Install)
         {
             Process.Start(downLocation + "setup.exe");
