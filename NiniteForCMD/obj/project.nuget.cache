@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "dgSpecHash": "oZ32sovZhaOcYt2ilBdgKQtzAFE+rMdigAwii+rmryKIb7QJ52L3b5BsrxE8002t0z6Y93ykwX531ESfX5xsMw==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\remus\\source\\repos\\Clones\\NiniteForCMD\\NiniteForCMD.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\remus\\.nuget\\packages\\htmlagilitypack\\1.11.53\\htmlagilitypack.1.11.53.nupkg.sha512",
+    "C:\\Users\\remus\\.nuget\\packages\\microsoft.bcl\\1.1.10\\microsoft.bcl.1.1.10.nupkg.sha512",
+    "C:\\Users\\remus\\.nuget\\packages\\microsoft.bcl.build\\1.0.14\\microsoft.bcl.build.1.0.14.nupkg.sha512",
+    "C:\\Users\\remus\\.nuget\\packages\\microsoft.net.http\\2.2.29\\microsoft.net.http.2.2.29.nupkg.sha512",
+    "C:\\Users\\remus\\.nuget\\packages\\system.data.datasetextensions\\4.5.0\\system.data.datasetextensions.4.5.0.nupkg.sha512"
+  ],
+  "logs": []
+}
