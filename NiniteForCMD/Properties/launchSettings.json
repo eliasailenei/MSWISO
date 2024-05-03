@@ -1,7 +1,8 @@
 {
   "profiles": {
     "NiniteForCMD": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "SELECT 'CHROME' + 'VLC',DOWNLOAD"
     }
   }
 }

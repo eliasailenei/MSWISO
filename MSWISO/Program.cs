@@ -1,5 +1,4 @@
-﻿// Thanks for using my program! Please consider to support me by giving me tips! -Elias Ailenei github.com/eliasailenei
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
@@ -13,7 +12,7 @@ using System.Diagnostics;
 
 class Program
 {
-    static DataTable dataTable;
+    static DataTable dataTable; // the local database that saves the data
     static HtmlAgilityPack.HtmlDocument document;
     static string getiso;
     static string entryUrl;
@@ -30,13 +29,13 @@ class Program
     {
         string winVer = null;
         string release = null;
-        string language = null;
+        string language = null; // here are just the placeholders for the command line arguments
         string esdmode = null;
         string torrentdownload = null;
         string help = "placehold";
-       
+       // input might be --ESDMode=True --WinVer=Windows_10 --Release=22H2 --Language=German
 
-        for (int i = 0; i < args.Length; i++)
+        for (int i = 0; i < args.Length; i++) // this is to populate the variables from the command line arguments
         {
             string arg = args[i];
             if (arg.StartsWith("--"))
@@ -60,23 +59,23 @@ class Program
         if (string.Equals(esdmode, "true", StringComparison.OrdinalIgnoreCase))
         {
 
-            esd = true;
+            esd = true; // sets the ESDMode function as true
             
         }
         if (string.Equals(torrentdownload, "true", StringComparison.OrdinalIgnoreCase))
         {
 
-            torrent = true;
+            torrent = true; // this allows for torrents to be downloaded
 
         }
-        string[] validVersions = { "Windows 7", "Windows 8", "Windows 10", "Windows 11" };
-        dataTable = CreateTable(esd);
+        string[] validVersions = { "Windows 7", "Windows 8", "Windows 10", "Windows 11" }; // the versions that the API supports
+        dataTable = CreateTable(esd); // this creates the local database, check the comments at CreateTable for more
 
         if (winVer == null)
         {
-            OutHelp();
+            OutHelp(); // if any input is invalid, then the program will show the help dialog
         }
-        else if (!Array.Exists(validVersions, v => v == winVer))
+        else if (!Array.Exists(validVersions, v => v == winVer)) // here is an example of an error when the user inputs a wrong windows version like Windows 8.1
         {
             Console.WriteLine($"Invalid Windows version: {winVer}");
             Console.WriteLine("Please choose from the following:");
@@ -90,7 +89,7 @@ class Program
         {
             if (winVer != null)
             {
-                MakeTXT(winVer);
+                MakeTXT(winVer); // this outputs all the releases avaliable for the selected windows version
             }
             if (release != null & winVer != null)
             {
@@ -98,8 +97,8 @@ class Program
             }
             if (release != null && winVer != null)
             {
-                string processedRelease = argsFormat(release);
-                DataRow matchingRow = FindMatchingRow("Version Type", processedRelease);
+                string processedRelease = argsFormat(release); // removes the _
+                DataRow matchingRow = FindMatchingRow("Version Type", processedRelease); // checks if the release is a real thing
 
                 if (matchingRow != null)
                 {
@@ -114,14 +113,14 @@ class Program
             }
             if (language == null)
             {
-                await MakeLangTXT();
+                await MakeLangTXT(); // this will create a text file with all the languages avaliable
             }
             if (language != null)
             {
-                string langURL = await GetLangURL(language);
+                string langURL = await GetLangURL(language); // this generates a URL based on the language given
                 if (langURL != null)
                 {
-                    ISOFilter(langURL);
+                    ISOFilter(langURL); // this will format the url and then download it
                 }
 
             }
@@ -130,7 +129,7 @@ class Program
       
     }
 
-    static DataRow FindMatchingRow(string columnName, string searchValue)
+    static DataRow FindMatchingRow(string columnName, string searchValue) // simple function which will will search for the input inside a row
     {
         foreach (DataRow row in dataTable.Rows)
         {
@@ -147,7 +146,7 @@ class Program
     {
         return input.Replace('_', ' ');
     }
-    static void OutHelp()
+    static void OutHelp() // This will display the help page when the user needs it
     {
         Console.WriteLine("Welcome to MicroSoft Windows ISO generator!");
         Console.WriteLine();
@@ -186,36 +185,36 @@ class Program
         Console.ReadLine();
     }
 
-    static DataTable CreateTable(bool esd)
+    static DataTable CreateTable(bool esd) // this function is first called to scrape the site and get the correct data
     {
         
         string searchfor;
         if (esd == true)
         {
             
-            searchfor = "Operating Systems - (ESD)";
+            searchfor = "Operating Systems - (ESD)"; // the website has different links for ESD
         }
         else
         {
           
-            searchfor = "Operating Systems";
+            searchfor = "Operating Systems"; // these are ISO or torrents
         }
-        DataTable dataTable = new DataTable();
+        DataTable dataTable = new DataTable(); // new datatable created
         var newload = new HtmlWeb();
         var url = newload.Load("https://files.rg-adguard.net/category");
         var link = url.DocumentNode
             .Descendants("a")
-            .FirstOrDefault(a => a.InnerText == searchfor);
+            .FirstOrDefault(a => a.InnerText == searchfor); // searches for all a nodes 
         dataTable = new DataTable();
         if (link != null)
         {
             var load = new HtmlWeb();
-            document = load.Load(link.GetAttributeValue("href", ""));
+            document = load.Load(link.GetAttributeValue("href", "")); // gets all the hrefs into the table
 
             dataTable.Columns.Add("Name");
             dataTable.Columns.Add("Version Type");
             dataTable.Columns.Add("URL");
-            DisplayAnchorTags(document.DocumentNode, dataTable);
+            DisplayAnchorTags(document.DocumentNode, dataTable); // passes data on to be filtered
         }
         return dataTable;
     }
@@ -224,16 +223,16 @@ class Program
     {
         string selectedVersion = winVer;
 
-        DataRow[] filteredRows = dataTable.Select($"Name LIKE '%{selectedVersion}%'");
+        DataRow[] filteredRows = dataTable.Select($"Name LIKE '%{selectedVersion}%'"); // Normally, we will get all the windows versions for example windows 10 and windows 11. We only filter what we need
       
 
-        string outputFilePath = "output.txt";
+        string outputFilePath = "output.txt"; // new text file is made //writing and reading a file
         using (StreamWriter writer = new StreamWriter(outputFilePath))
         {
             foreach (DataRow row in filteredRows)
             {
                 string versionType = row["Version Type"].ToString();
-                writer.WriteLine(versionType);
+                writer.WriteLine(versionType); // writes all the releases for the given windows version
             }
         }
 
@@ -242,15 +241,15 @@ class Program
 
     static async Task<string> GetLangURL(string selectedLanguage)
     {
-        string url = getiso;
+        string url = getiso; // this is composed by the main website + the release
         var httpClient = new HttpClient();
         var response = await httpClient.GetAsync(url);
-        var htmlContent = await response.Content.ReadAsStringAsync();
+        var htmlContent = await response.Content.ReadAsStringAsync(); // gets the data from the site
 
         var document = new HtmlAgilityPack.HtmlDocument();
         document.LoadHtml(htmlContent);
 
-        var anchorTags = document.DocumentNode.SelectNodes("//a");
+        var anchorTags = document.DocumentNode.SelectNodes("//a"); // chooses all the a nodes, the website has made it in a way that all directories are just a hrefs
 
         if (anchorTags != null)
         {
@@ -259,20 +258,20 @@ class Program
                 entryUrl = anchorTag.GetAttributeValue("href", "");
                 language = anchorTag.InnerHtml;
 
-                language = Regex.Replace(language, "<.*?>", string.Empty);
+                language = Regex.Replace(language, "<.*?>", string.Empty); // cleans any impurities in the link
 
-                if (string.IsNullOrWhiteSpace(entryUrl) || string.IsNullOrWhiteSpace(language))
+                if (string.IsNullOrWhiteSpace(entryUrl) || string.IsNullOrWhiteSpace(language)) // from here
                     continue;
 
                 if (!entryUrl.StartsWith("https://"))
                     continue;
 
                 if (Regex.IsMatch(language, "[^a-zA-Z]"))
-                    continue;
+                    continue; // to here, the website has some garbage such as his twitter account or the websites title. Ive filtered the links more
 
                 if (selectedLanguage.Equals(language, StringComparison.OrdinalIgnoreCase))
                 {
-                    return entryUrl;
+                    return entryUrl; // give the URL with the correct language so main website + the release + language
                 }
             }
         }
@@ -280,7 +279,7 @@ class Program
         return null;
     }
 
-    static async Task MakeLangTXT()
+    static async Task MakeLangTXT() // this is the same as GetLangURL execpt that insted of only returing the language we want, we show all languages avaliable into a text file
     {
         string url = getiso;
         var httpClient = new HttpClient();
@@ -320,7 +319,7 @@ class Program
     }
 
 
-    static void filer1(string release)
+    static void filer1(string release) // a filter to only give out the release we want
     {
         string selectedVersionType = release;
 
@@ -338,6 +337,7 @@ class Program
 
     static void DisplayAnchorTags(HtmlNode node, DataTable dataTable)
     {
+        // Retrieve all anchor tags within the provided HTML node
         var anchorTags = node.Descendants("a");
 
         foreach (var anchorTag in anchorTags)
@@ -345,13 +345,17 @@ class Program
             string name = anchorTag.InnerText;
             string url = anchorTag.GetAttributeValue("href", "");
 
+            // Check if the extracted name is not null or empty
             if (!string.IsNullOrWhiteSpace(name))
             {
+                // Check if the name contains a valid Windows version
                 if (IsWindowsVersionInRange(name))
                 {
-                    string versionType = GetVersionType(name);
-                    name = RemoveVersionType(name);
+                    // If the name contains a valid version, extract the version type, remove it from the name, and add the details to the DataTable
+                    string versionType = GetVersionType(name); 
+                    name = RemoveVersionType(name); 
 
+                    // Add the name, version type, and URL to the DataTable
                     dataTable.Rows.Add(name, versionType, url);
                 }
 
@@ -360,14 +364,18 @@ class Program
         }
     }
 
+    
     static bool IsWindowsVersionInRange(string name)
     {
+        // These are the accepted Windows versions avaliable
         string[] validVersions = { "Windows 7", "Windows 8", "Windows 8.1", "Windows 10", "Windows 11" };
 
         foreach (string version in validVersions)
         {
+            // Check if the name contains the current version
             if (name.Contains(version))
             {
+                // If the version is found in the name, return true
                 return true;
             }
         }
@@ -375,7 +383,8 @@ class Program
         return false;
     }
 
-    static string RemoveVersionType(string name)
+
+    static string RemoveVersionType(string name) // this removes any unsupported windows versions like Windows 10 Mobile Enterprise
     {
         string updatedName = name;
 
@@ -404,7 +413,7 @@ class Program
         return updatedName;
     }
 
-    static string GetVersionType(string name)
+    static string GetVersionType(string name) // gets the version from the input given
     {
         int index = name.IndexOf("Windows", StringComparison.OrdinalIgnoreCase);
         if (index != -1)
@@ -414,7 +423,7 @@ class Program
         }
         return string.Empty;
     }
-    static List<string[]> GetUrlsAndHypertexts(string url)
+    static List<string[]> GetUrlsAndHypertexts(string url) // an a href extractor
     {
         List<string[]> urlsAndHypertexts = new List<string[]>();
         try
@@ -447,12 +456,12 @@ class Program
 
         return urlsAndHypertexts;
     }
-    static void ISOFilter(string langURL)
+    static void ISOFilter(string langURL) // this method gets the url ready to be downloaded
     {
 
         if (esd)
         {
-            ext = ".esd";
+            ext = ".esd"; // if ESDMode is on then we expect a ESD file
         }
         else
         {
@@ -461,11 +470,11 @@ class Program
         bool found = false;
         string foundUrl = "";
         string targetUrl = langURL;
-        List<string[]> urlsAndHypertexts = GetUrlsAndHypertexts(targetUrl);
+        List<string[]> urlsAndHypertexts = GetUrlsAndHypertexts(targetUrl); // gets all the links from the main site + release + language
 
         if (urlsAndHypertexts.Count > 0)
         {
-            string pattern = @"^\d.*?x64.*?\"+ ext +"$"; 
+            string pattern = @"^\d.*?x64.*?\"+ ext +"$"; // we ony want x64 bit versions of the release
 
             List<string[]> filteredArray = new List<string[]>();
 
@@ -473,11 +482,11 @@ class Program
             {
                 if (System.Text.RegularExpressions.Regex.IsMatch(row[1], pattern))
                 {
-                    filteredArray.Add(row);
+                    filteredArray.Add(row); // if found then add them
                 }
             }
 
-            if (filteredArray.Count == 0)
+            if (filteredArray.Count == 0) // some links have en-us at the end which makes the regex not work, we use another regex in this case
             {
                 string langPattern = @"(en-us|en-gb|es-es|es|fr-fr|fr|de-de|de|zh-cn|zh|ja-jp|ja|ko-kr|ko|it-it|it|pt-br|pt|pt-pt|ru-ru|ru|ar-sa|ar|tr-tr|tr|nl-nl|nl|pl-pl|pl|sv-se|sv|nb-no|nb|da-dk|da|fi-fi|fi|el-gr|el|he-il|he|hi-in|hi|th-th|th|vi-vn|vi|uk-ua|uk|cs-cz|cs|hu-hu|hu|ro-ro|ro|bg-bg|bg|ms-my|ms|id-id|id|fil-ph|fil|bn-in|bn|ur-pk|ur|pa-in|pa|ta-in|ta).*64.*[^\w]x64[^\w].*\" + ext + "$";
 
@@ -485,14 +494,14 @@ class Program
                 {
                     if (System.Text.RegularExpressions.Regex.IsMatch(row[1], langPattern, RegexOptions.IgnoreCase))
                     {
-                        filteredArray.Add(row);
+                        filteredArray.Add(row); // add the urls that have the language we need
                         break;
                     }
 
 
                     if (filteredArray.Count > 0)
                     {
-                        break;
+                        break; // we stop the for each loop just in case
                     }
                 }
             }
@@ -505,7 +514,7 @@ class Program
                 {
                     if (row[1].IndexOf("SW", StringComparison.OrdinalIgnoreCase) >= 0 && !(row[1].IndexOf("arm64", StringComparison.OrdinalIgnoreCase) >= 0))
                     {
-                        swFilteredArray.Add(row);
+                        swFilteredArray.Add(row); // we don't want arm64 releases as PortableISO is x64 based only
                     }
                 }
 
@@ -517,7 +526,7 @@ class Program
 
             if (filteredArray.Count > 0)
             {
-                foundUrl = filteredArray[0][0];
+                foundUrl = filteredArray[0][0]; // now we give the correct url and to get ready for the install
                 Console.WriteLine(foundUrl);
                 found = true;
             }
@@ -533,7 +542,7 @@ class Program
 
         if (found)
         {
-            POST(foundUrl);
+            POST(foundUrl); // only start install once we have found the correct version
         }
     }
 
@@ -542,26 +551,26 @@ class Program
 
     public static void POST(string foundUrl)
     {
-        Task task = MakePostRequestWithRetry(foundUrl);
+        Task task = MakePostRequestWithRetry(foundUrl); // this will now make a POST request to get the microsoft link
         task.Wait();
         Console.WriteLine("Press Enter to exit.");
 
     }
     public static async Task MakePostRequestWithRetry(string foundUrl)
     {
-        string url = foundUrl;
-        string progressFileName = "progress.txt";
+        string url = foundUrl; // this is our good url
+        string progressFileName = "progress.txt"; // this is where we give progress so that other apps can use it
 
         using (HttpClient httpClient = new HttpClient())
         {
             var payloadOfficial = new FormUrlEncodedContent(new[]
             {
-                new KeyValuePair<string, string>("dl_official", "Test")
+                new KeyValuePair<string, string>("dl_official", "Test") // this is for if the file is an .iso or an .esd
             });
 
             var payloadBt = new FormUrlEncodedContent(new[]
             {
-                new KeyValuePair<string, string>("dl_bt", "Test")
+                new KeyValuePair<string, string>("dl_bt", "Test") // this is for .torrent
             });
 
             HttpResponseMessage response;
@@ -569,24 +578,24 @@ class Program
             response = await httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Post, url)
             {
                 Content = payloadOfficial
-            }, HttpCompletionOption.ResponseHeadersRead);
+            }, HttpCompletionOption.ResponseHeadersRead); // we now get the response from the POST server, this will give us a url we can use
 
-            if (response.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode) // status code must be 200 for this 
             {
                 try
                 {
-                    await ESDDownload(response, progressFileName);
+                    await ESDDownload(response, progressFileName); //downloads file async
                 }
                 catch (Exception ex)
                 {
-                    if (ex is System.UriFormatException uriException && uriException.Message.Contains("An invalid request URI was provided"))
+                    if (ex is System.UriFormatException uriException && uriException.Message.Contains("An invalid request URI was provided")) // this will show if the version is no longer hosted
                     {
                         File.WriteAllText("NoAva.txt", "True");
                         Console.WriteLine("MS error, file no longer hosted. Try a newer version...");
                     }
                     else
                     {
-                      continueDlnd = true;
+                      continueDlnd = true; // sometimes microsoft likes to take breaks when downloading e.g its not just one file stream as they have many CDN's
                        await ESDDownload(response, progressFileName);
                     }
                 }
@@ -594,7 +603,7 @@ class Program
 
             else
             {
-                usingTorrent = true;
+                usingTorrent = true; // we assume that we are working with a torrent
                 response = await httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Post, url)
                 {
                     Content = payloadBt
@@ -602,10 +611,10 @@ class Program
 
                 if (response.IsSuccessStatusCode)
                 {
-                   await TorrentDownload(response, progressFileName);
+                   await TorrentDownload(response, progressFileName); //download the torrent file
 
                     Console.WriteLine("File download completed!");
-                    using (StreamWriter writer = new StreamWriter("usingtor.txt"))
+                    using (StreamWriter writer = new StreamWriter("usingtor.txt")) // torrents are only avaliable for MSWISO and not for PortableISO
                     {
                         writer.Write("True");
                     }
@@ -616,7 +625,7 @@ class Program
 
                         ProcessStartInfo startInfo = new ProcessStartInfo
                         {
-                            FileName = "aria2c",
+                            FileName = "aria2c", // I use aria2c as its FOSS
                             Arguments = $"--show-console-readout=true \"{torrentUrl}\" --dir=\"{downloc}\"\\ ",
                             RedirectStandardOutput = true,
                             UseShellExecute = false,
@@ -629,7 +638,7 @@ class Program
                             while (!process.StandardOutput.EndOfStream)
                             {
                                 string WhtOut = process.StandardOutput.ReadLine();
-                                AddProgress(WhtOut);
+                                AddProgress(WhtOut); // adds the progress from aria2c to the text file if progress is needed
                                 
 
                             }
@@ -645,10 +654,10 @@ class Program
     }
     static async Task ESDDownload(HttpResponseMessage response, string progressFileName)
     {
-        if (response.IsSuccessStatusCode)
+        if (response.IsSuccessStatusCode) // only works when code is 200
         {
             long? totalSize = response.Content.Headers.ContentLength;
-            string continMode = continueDlnd ? "Append" : "Create";
+            string continMode = continueDlnd ? "Append" : "Create"; // if not continueDlnd then its create otherwise append onto the file
             FileMode fileMode = continMode == "Append" ? FileMode.Append : FileMode.Create;
 
             using (Stream contentStream = await response.Content.ReadAsStreamAsync())
@@ -663,15 +672,15 @@ class Program
                 {
                     await fs.WriteAsync(buffer, 0, bytesRead);
 
-                    totalBytesRead += bytesRead;
+                    totalBytesRead += bytesRead; // this read the amount of bytes transfered
 
                     if (totalSize.HasValue)
                     {
-                        int progressPercentage = (int)(((double)totalBytesRead / totalSize.Value) * 100);
+                        int progressPercentage = (int)(((double)totalBytesRead / totalSize.Value) * 100); // we do some calculations to get a good percentage
 
                         if (progressPercentage != prevPercent)
                         {
-                            Console.WriteLine($"{progressPercentage}%");
+                            Console.WriteLine($"{progressPercentage}%"); // display progress
                             prevPercent = progressPercentage;
                         }
                     }
@@ -685,7 +694,7 @@ class Program
     {
         long? totalSize = response.Content.Headers.ContentLength;
         using (Stream contentStream = await response.Content.ReadAsStreamAsync())
-        using (FileStream fs = new FileStream("test" + ext, FileMode.Create))
+        using (FileStream fs = new FileStream("test" + ext, FileMode.Create)) // we are only downloading a small file so no need for appending
         using (StreamWriter progressWriter = new StreamWriter(progressFileName))
         {
             byte[] buffer = new byte[8192];
@@ -696,31 +705,31 @@ class Program
             {
                 await fs.WriteAsync(buffer, 0, bytesRead);
 
-                totalBytesRead += bytesRead;
+                totalBytesRead += bytesRead; // this read the amount of bytes transfered
 
                 if (totalSize.HasValue)
                 {
-                    double progressPercentage = (double)totalBytesRead / totalSize.Value;
+                    double progressPercentage = (double)totalBytesRead / totalSize.Value;// we do some calculations to get a good percentage
                     progressWriter.WriteLine($"{progressPercentage:P2}");
-                    Console.WriteLine($"{progressPercentage:P2}");
+                    Console.WriteLine($"{progressPercentage:P2}"); // display progress
                 }
             }
         }
     }
     
-    static  void AddProgress(string common)
+    static  void AddProgress(string common) // adds progress to the text file
     {
         string pattern = @"\((\d+)%\)";
         MatchCollection matches = Regex.Matches(common, pattern);
         string newInput = "";
         foreach (Match newMatch in matches)
         {
-            newInput += newMatch.Groups[1].Value + "%";
+            newInput += newMatch.Groups[1].Value + "%"; // makes sure that we only put the percentage and not other things like the amount of peers or download speed ect.
         }
 
         using (StreamWriter writer = new StreamWriter("progress.txt", true))
         {
-            writer.WriteLine(newInput);
+            writer.WriteLine(newInput); // write to file
             Console.WriteLine(newInput);
         }
     }

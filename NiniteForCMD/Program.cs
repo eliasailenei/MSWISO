@@ -15,7 +15,7 @@ using System.Net.Http;
 using Microsoft.SqlServer.Server;
 using System.IO;
 
-class NiniteForCMD
+class NiniteForCMDs
 {
     static string[] selected;
     static string[] value;
@@ -27,18 +27,18 @@ class NiniteForCMD
     static async Task Main()
     {
        
-        DataTable dataTable = new DataTable();
-        userInput = "SHOW TITLE";
+        DataTable dataTable = new DataTable(); // new table created
+        userInput = "SHOW TITLE"; // This is put here so that the user sees the programs avaliable first time
         dataTable.Columns.Add("VALUE", typeof(string));
-        dataTable.Columns.Add("SRC", typeof(string));
+        dataTable.Columns.Add("SRC", typeof(string)); 
         dataTable.Columns.Add("TITLE", typeof(string));
         bool exit = false;
         Console.WriteLine("Scraping Ninite... Please wait...");
-        await GetData(dataTable);
+        await GetData(dataTable); // scrapes Ninite for the latest data
         Console.Clear();
-        Show(dataTable, userInput);
+        Show(dataTable, userInput); // shows the programs avaliable
         Console.WriteLine("");
-        Console.WriteLine("llWelcome to NiniteForCMD! Type HELP to get started.");
+        Console.WriteLine("Welcome to NiniteForCMD! Type HELP to get started.");
         Console.WriteLine("");
         value = new string[128];
         selectedValue = new string[128];
@@ -46,7 +46,7 @@ class NiniteForCMD
        
         foreach (DataRow row in dataTable.Rows)
         {
-            value[pointss] = row["VALUE"].ToString();
+            value[pointss] = row["VALUE"].ToString(); // populate the array with the values of the programs e.g Google Chrome is chrome
 
             pointss++;
 
@@ -55,13 +55,13 @@ class NiniteForCMD
         {
             if (args.Length > 1)
             {
-                argsMode(dataTable, exit);
-                exit = true;
+                argsMode(dataTable, exit);// this program can use CLI arugments and treats every input as one line entered
+                exit = true; // because we are using CLI exit immediately
             } else
             {
-                userLower = GetUserInput();
-                userInput = userLower.ToUpper();
-                Selecter(dataTable, userInput, exit, userLower);
+                userLower = GetUserInput(); // get user input
+                userInput = userLower.ToUpper(); // makes it all caps to make it easier to search
+                Selecter(dataTable, userInput, exit, userLower); // this is where each command is sent to its corresponding method
             }
             
         }
@@ -71,16 +71,16 @@ class NiniteForCMD
         Console.WriteLine("Using args!");
         isArgs = true;
         string input = string.Join(" ", args);
-        string[] arr = input.Split(',');
+        string[] arr = input.Split(','); 
         if (arr.Length > 0)
         {
-            arr[0] = string.Join(" ", arr[0].Split(' ').Skip(1));
+            arr[0] = string.Join(" ", arr[0].Split(' ').Skip(1)); // removes the whitespace
         }
         for (int i = 0; i < arr.Length; i++)
         {
             userInput = arr[i];
             Console.WriteLine($"arr[{i + 1}] = {arr[i].Trim()}");
-            Selecter(dataTable, userInput.ToUpper(), exit, userLower);
+            Selecter(dataTable, userInput.ToUpper(), exit, userLower); // this wil now execute the CLI arugments one by one
         }
     }
     static void Selecter(DataTable dataTable, string userInput, bool exit, string userlower)
@@ -89,7 +89,7 @@ class NiniteForCMD
         switch (userInput)
         {
             case "HELP":
-                Help();
+                Help(); //shows help
                 break;
             default:
                 if (userInput.StartsWith("SHOW"))
@@ -144,31 +144,31 @@ class NiniteForCMD
     }
     static async Task GetData(DataTable dataTable)
     {
-        HashSet<string> uniqueTITLEs = new HashSet<string>();
+        HashSet<string> uniqueTITLEs = new HashSet<string>(); // this is so we don't have duplicates
         using (HttpClient client = new HttpClient())
         {
 
-            try
+            try // we use try as sometimes network is down
             {
-                string url = "https://ninite.com/";
+                string url = "https://ninite.com/"; // calling api
                 string htmlContent = await client.GetStringAsync(url);
                 HtmlDocument doc = new HtmlDocument();
-                doc.LoadHtml(htmlContent);
-                HtmlNodeCollection liNodes = doc.DocumentNode.SelectNodes("//li");
+                doc.LoadHtml(htmlContent); // gets the data from the site
+                HtmlNodeCollection liNodes = doc.DocumentNode.SelectNodes("//li"); // we only care for li nodes
                 if (liNodes != null)
                 {
                     foreach (HtmlNode liNode in liNodes)
                     {
-                        HtmlNode labelNode = liNode.SelectSingleNode(".//label");
+                        HtmlNode labelNode = liNode.SelectSingleNode(".//label"); // select one of the programs
                         if (labelNode != null)
                         {
-                            string VALUE = liNode.SelectSingleNode(".//input")?.GetAttributeValue("VALUE", "");
-                            string SRC = labelNode.SelectSingleNode(".//img")?.GetAttributeValue("SRC", "");
-                            string TITLE = labelNode.GetAttributeValue("TITLE", "");
+                            string VALUE = liNode.SelectSingleNode(".//input")?.GetAttributeValue("VALUE", ""); // we extract the value
+                            string SRC = labelNode.SelectSingleNode(".//img")?.GetAttributeValue("SRC", ""); // we extract the image locations
+                            string TITLE = labelNode.GetAttributeValue("TITLE", ""); // we extract the actual name
                             string labelText = labelNode.InnerText.Trim();
 
 
-                            if (!uniqueTITLEs.Contains(TITLE))
+                            if (!uniqueTITLEs.Contains(TITLE)) // we make sure that data only occurs once
                             {
                                 dataTable.Rows.Add(VALUE, SRC, labelText);
                                 uniqueTITLEs.Add(TITLE);
@@ -195,7 +195,7 @@ class NiniteForCMD
             int findLoc = 0;
             if (isArgs)
             {
-                foreach (string com in args)
+                foreach (string com in args) // this finds the location where the location string is located at as text is normally all caps 
                 {
                     if (!com.Contains("LOCATION"))
                     {
@@ -206,14 +206,14 @@ class NiniteForCMD
                     }
                     
                 }
-                string location = args[findLoc + 1];
+                string location = args[findLoc + 1]; // find the true location
                 int problem = location.IndexOf(',');
                 if (problem != -1)
                 {
-                    downLocation = location.Substring(0, problem);
+                    downLocation = location.Substring(0, problem); 
                 } else
                 {
-                    downLocation = location;
+                    downLocation = location; // we assume that this is the actual location
                 }
                 
                 Console.WriteLine($"Download location: {downLocation}");
@@ -233,7 +233,7 @@ class NiniteForCMD
             }
         }catch (Exception e)
         {
-            //Console.WriteLine (e.ToString());
+            //Console.WriteLine (e.ToString()); // debug purposes only
             //if (userLower == null)
             //{
             //    Console.WriteLine("NULL!");
@@ -243,10 +243,10 @@ class NiniteForCMD
     }
 
     static private void Show(DataTable dataTable, string userin)
-    {
+    { // we might have text like SHOW VALUE
         string[] split = userin.Split(' ');
-        string toPass = " ";
-        if (split.Length > 2)
+        string toPass = " "; 
+        if (split.Length > 2) // makes sure that its valid input
         {
             Console.WriteLine("ERROR: Invalid SHOW input, type HELP for more");
         }
@@ -254,13 +254,13 @@ class NiniteForCMD
         {
             foreach (string word in split)
             {
-                toPass = word;
+                toPass = word; // gets the last word after SHOW in this case VALUE
             }
         }
         if (toPass == "SELECTED")
         {
             Console.WriteLine("The following is selected:");
-            foreach (string items in selected)
+            foreach (string items in selected) // selected only needs to show what the user has selected
             {
                 Console.WriteLine(items + " ");
             }
@@ -272,16 +272,16 @@ class NiniteForCMD
             try
             {
                 int itemCount = dataTable.Rows.Count;
-                int maxItems = Math.Min(itemsPerRow * itemsPerColumn, itemCount);
-                int maxTITLELength = dataTable.AsEnumerable().Select(row => row.Field<string>(toPass)).Max(TITLE => TITLE.Length);
+                int maxItems = Math.Min(itemsPerRow * itemsPerColumn, itemCount); //simple math
+                int maxTITLELength = dataTable.AsEnumerable().Select(row => row.Field<string>(toPass)).Max(TITLE => TITLE.Length); 
 
                 for (int i = 0; i < maxItems; i++)
                 {
                     DataRow dataRow = dataTable.Rows[i];
-                    string TITLE = dataRow[toPass].ToString();
+                    string TITLE = dataRow[toPass].ToString(); // gets the data from selected row
                     Console.Write(TITLE.PadRight(maxTITLELength + 2));
 
-                    if ((i + 1) % itemsPerRow == 0)
+                    if ((i + 1) % itemsPerRow == 0) // this spaces out the text
                     {
                         Console.WriteLine();
                     }
@@ -303,11 +303,12 @@ class NiniteForCMD
     {
         Console.Write("INPUT>> ");
         string userIn = Console.ReadLine();
-        return userIn;
+        Console.Clear();
+        return userIn; // just returns the user input
     }
 
     static void Help()
-    {
+    { // when user is stuck
         string helpText = @"
 CMD Help:
 
@@ -363,7 +364,7 @@ EXIT - Ends session.
         {
             foreach (string word in split)
             {
-                toPass = word;
+                toPass = word; // gets the command word E.g ALL or selected
             }
         }
         try
@@ -394,7 +395,7 @@ EXIT - Ends session.
             {
                 foreach (DataRow row in dataTable.Rows)
                 {
-                    exportData.AppendLine(row[toPass].ToString());
+                    exportData.AppendLine(row[toPass].ToString()); // the user can say EXPORT TITLE, in this case we only need data from title row
                 }
             }
             File.WriteAllText("EXPORT.TXT", exportData.ToString());
@@ -409,15 +410,15 @@ EXIT - Ends session.
     {
         int point = 0;
         bool found = false;
-        string pattern = @"'([^']+)'";
+        string pattern = @"'([^']+)'"; // use input is like 'Chrome' + 'VLC' so we remove the plus and ' //regex
         MatchCollection matches = Regex.Matches(userin, pattern);
 
-        if (userin == "SELECT ALL")
+        if (userin == "SELECT ALL") 
         {
             selected = new string[dataTable.Rows.Count];
             for (int i = 0; i < dataTable.Rows.Count; i++)
             {
-                selectedValue[i] = dataTable.Rows[i]["VALUE"].ToString();
+                selectedValue[i] = dataTable.Rows[i]["VALUE"].ToString(); // put all the values in the array so its ready to be downloaded
             }
         }
         else
@@ -433,14 +434,14 @@ EXIT - Ends session.
                 selected = new string[matches.Count];
                 for (int i = 0; i < matches.Count; i++)
                 {
-                    selected[i] = matches[i].Groups[1].Value.ToUpper();
+                    selected[i] = matches[i].Groups[1].Value.ToUpper(); // put all the data that is found so in this case Chrome and VLC
                 }
             }
 
 
 
 
-            foreach (string substring in selected)
+            foreach (string substring in selected) // this part of the code checks if the user input is actually part of the data set it checks if userinput matches to what there is in Title, if there is a match then get the location from title and get the result from value
             {
                 for (int i = 0; i < dataTable.Rows.Count; i++)
                 {
@@ -468,7 +469,7 @@ EXIT - Ends session.
         try
         {
 
-            foreach (string word in selectedValue)
+            foreach (string word in selectedValue) // adds a dash at every value in the array so chrome-vlc-
             {
                 if (word != null)
                 {
@@ -481,8 +482,8 @@ EXIT - Ends session.
                 
             }
 
-            string newOut = System.Text.RegularExpressions.Regex.Replace(uri.ToString(), regex, "");
-            string acc = "https://ninite.com/" + newOut + "/";
+            string newOut = System.Text.RegularExpressions.Regex.Replace(uri.ToString(), regex, ""); // removes any - at the end if there is any
+            string acc = "https://ninite.com/" + newOut + "/"; //creates a new valid url
             return acc;
 
         }
@@ -493,14 +494,14 @@ EXIT - Ends session.
     }
     static async void Download(bool Install)
     {
-        download = URLCreate() + "ninite.exe";
+        download = URLCreate() + "ninite.exe"; // creates the ur; //writing and reading a file
         using (WebClient client = new WebClient())
         {
-            client.DownloadFile(download, downLocation + "setup.exe");
+            client.DownloadFile(download, downLocation + "setup.exe");// downloads the file
         }
         if (Install)
         {
-            Process.Start(downLocation + "setup.exe");
+            Process.Start(downLocation + "setup.exe"); // open the file after it has been downloaded
         }
     }
 

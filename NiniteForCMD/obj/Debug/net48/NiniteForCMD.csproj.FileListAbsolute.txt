@@ -18,5 +18,6 @@ C:\Users\remus\source\repos\Clones\NiniteForCMD\obj\Debug\net48\NiniteForCMD.Gen
 C:\Users\remus\source\repos\Clones\NiniteForCMD\obj\Debug\net48\NiniteForCMD.AssemblyInfoInputs.cache
 C:\Users\remus\source\repos\Clones\NiniteForCMD\obj\Debug\net48\NiniteForCMD.AssemblyInfo.cs
 C:\Users\remus\source\repos\Clones\NiniteForCMD\obj\Debug\net48\NiniteForCMD.csproj.CoreCompileInputs.cache
-C:\Users\remus\source\repos\Clones\NiniteForCMD\obj\Debug\net48\NiniteForCMD.csproj.CopyComplete
 C:\Users\remus\source\repos\Clones\NiniteForCMD\obj\Debug\net48\NiniteForCMD.exe
+C:\Users\remus\source\repos\Clones\NiniteForCMD\obj\Debug\net48\NiniteForCMD.sourcelink.json
+C:\Users\remus\source\repos\Clones\NiniteForCMD\obj\Debug\net48\NiniteFo.908868A4.Up2Date

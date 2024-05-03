@@ -1,7 +1,8 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\MSWISO"
   ],
-  "SelectedNode": "\\MSWISO.sln",
+  "SelectedNode": "\\MSWISO\\Program.cs",
   "PreviewInSolutionExplorer": false
 }

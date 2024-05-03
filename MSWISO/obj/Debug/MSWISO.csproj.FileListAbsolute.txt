@@ -29,6 +29,6 @@ C:\Users\remus\source\repos\Clones\MSWISO\bin\Debug\HtmlAgilityPack.pdb
 C:\Users\remus\source\repos\Clones\MSWISO\bin\Debug\HtmlAgilityPack.xml
 C:\Users\remus\source\repos\Clones\MSWISO\obj\Debug\MSWISO.csproj.AssemblyReference.cache
 C:\Users\remus\source\repos\Clones\MSWISO\obj\Debug\MSWISO.csproj.CoreCompileInputs.cache
-C:\Users\remus\source\repos\Clones\MSWISO\obj\Debug\MSWISO.csproj.CopyComplete
 C:\Users\remus\source\repos\Clones\MSWISO\obj\Debug\MSWISO.exe
 C:\Users\remus\source\repos\Clones\MSWISO\obj\Debug\MSWISO.pdb
+C:\Users\remus\source\repos\Clones\MSWISO\obj\Debug\MSWISO.csproj.Up2Date
