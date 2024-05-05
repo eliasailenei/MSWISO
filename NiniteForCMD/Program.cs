@@ -197,7 +197,7 @@ class NiniteForCMDs
             {
                 foreach (string com in args) // this finds the location where the location string is located at as text is normally all caps 
                 {
-                    if (!com.Contains("LOCATION"))
+                    if (!com.Contains("LOCATION")) // location
                     {
                         findLoc++;
                     } else
